@@ -1,0 +1,113 @@
+unit Controller.unControllerDependente;
+
+interface
+
+uses
+  System.Generics.Collections, Entidade.Dependente, DAO.unDAOGenerico, Entidade.Funcionario,
+  System.Classes;
+
+type
+
+  IControllerDependente = interface
+    ['{A2274A62-DD49-4081-9274-1786E45A7FEE}']
+    function Salvar(Dependentes: TObjectList<TDependente>): Boolean; overload;
+    function Salvar(Entidade: TDependente): Boolean; overload;
+    function Remover(Dependentes: TObjectList<TDependente>): Boolean; overload;
+    function Remover(Entidade: TDependente): Boolean; overload;
+    function ObterListaDeDependentes(objFuncionario: TFuncionario): TObjectList<TDependente>;
+  end;
+
+  TControllerDependente = class(TInterfacedPersistent, IControllerDependente)
+  public
+    function Salvar(Dependentes: TObjectList<TDependente>): Boolean; overload;
+    function Salvar(Entidade: TDependente): Boolean; overload;
+    function Remover(Dependentes: TObjectList<TDependente>): Boolean; overload;
+    function Remover(Entidade: TDependente): Boolean; overload;
+    function ObterListaDeDependentes(objFuncionario: TFuncionario): TObjectList<TDependente>;
+    class function New: IControllerDependente;
+  end;
+
+implementation
+
+{ TControllerDependente }
+
+class function TControllerDependente.New: IControllerDependente;
+begin
+  Result := Self.Create;
+end;
+
+function TControllerDependente.ObterListaDeDependentes(
+  objFuncionario: TFuncionario): TObjectList<TDependente>;
+begin
+  Result := TObjectList<TDependente>.Create;
+  Result.Clear;
+  if ((not Assigned(objFuncionario)) or (objFuncionario.Id = 0)) then
+    Exit;
+  Result := TObjectList<TDependente>(TDAOGenerico<TDependente>.New.ObterListaDaEntidade('ID_FUNCIONARIO', objFuncionario.Id));
+end;
+
+function TControllerDependente.Remover(Entidade: TDependente): Boolean;
+var
+  lResultado: Boolean;
+begin
+  lResultado := False;
+  try
+    if not Assigned(Entidade) then
+      Exit;
+
+    TDAOGenerico<TDependente>.New.Delete(Entidade);
+    lResultado := True;
+  finally
+    Result := lResultado;
+  end;
+end;
+
+function TControllerDependente.Remover(
+  Dependentes: TObjectList<TDependente>): Boolean;
+var
+  lResultado: Boolean;
+begin
+  lResultado := False;
+  try
+    for var Dependente in Dependentes do
+      Remover(Dependente);
+    lResultado := True;
+  finally
+    Result := lResultado;
+  end;
+end;
+
+function TControllerDependente.Salvar(Entidade: TDependente): Boolean;
+var
+  lResultado: Boolean;
+begin
+  lResultado := False;
+  try
+    if Entidade.Id = 0 then
+       TDAOGenerico<TDependente>.New.Insert(Entidade)
+    else
+      TDAOGenerico<TDependente>.New.Update(Entidade);
+    lResultado := True;
+  finally
+    Result := lResultado;
+  end;
+end;
+
+function TControllerDependente.Salvar(
+  Dependentes: TObjectList<TDependente>): Boolean;
+var
+  lResultado: Boolean;
+begin
+  lResultado := False;
+  try
+    for var Dependente in Dependentes do
+    begin
+      Salvar(Dependente);
+    end;
+    lResultado := True;
+  finally
+    Result := lResultado;
+  end;
+end;
+
+end.

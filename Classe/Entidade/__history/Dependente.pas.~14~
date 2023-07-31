@@ -1,0 +1,36 @@
+unit Dependente;
+
+interface
+
+uses
+  System.Classes, SimpleAttributes;
+
+type
+
+  [Tabela('DEPENDENTE')]
+  TDependente = class(TPersistent)
+  private
+    FId: Integer;
+    FIdFuncionario: Integer;
+    FNome: string;
+    FCalculaIR: Integer;
+    FCalculaINSS: Integer;
+  public
+    [Campo('ID'), PK, NotNull]
+    property Id: Integer read FId write FId;
+    [Campo('ID_FUNCIONARIO'), NotNull]
+    property IdFuncionario: Integer read FIdFuncionario write FIdFuncionario;
+    [Campo('NOME'), NotNull]
+    property Nome: string read FNome write FNome;
+    [Campo('CALCULAIR')]
+    property CalculaIR: Integer read FCalculaIR write FCalculaIR;
+    [Campo('CALCULAINSS')]
+    property CalculaINSS: Integer read FCalculaINSS write FCalculaINSS;
+  end;
+
+implementation
+
+initialization
+  RegisterClass(TDependente);
+
+end.

@@ -1,0 +1,69 @@
+unit Funcionario;
+
+interface
+
+uses
+  System.Generics.Collections, System.SysUtils, Dependente, System.Classes,
+   SimpleAttributes;
+
+type
+
+  [Tabela('FUNCIONARIO')]
+  TFuncionario = class(TPersistent)
+  private
+    Fid: Integer;
+    FNome: string;
+    FCPF: string;
+    FSalario: Double;
+    FINSS: Double;
+    FIR: Double;
+    FDependnetes: TObjectList<TDependente>;
+    procedure SetDependnetes(const Value: TObjectList<TDependente>);
+  public
+    constructor Create;
+    destructor Destroy; override;
+
+    [Campo('ID'), PK, NotNull]
+    property Id: Integer  read FId write FId;
+    [Campo('NOME'), NotNull]
+    property Nome: string read FNome write FNome;
+    [Campo('CPF'), NumberOnly, NotNull]
+    property CPF: string read FCPF write FCPF;
+    [Campo('SALARIO'), NotNull]
+    property Salario: Double read FSalario write FSalario;
+    [Ignore]
+    property INSS: Double read FINSS write FINSS;
+    [Ignore]
+    property IR: Double read FIR write FIR;
+    [Ignore]
+    property Dependnetes: TObjectList<TDependente> read FDependnetes write SetDependnetes;
+  end;
+
+
+implementation
+
+{ TFuncionario }
+
+constructor TFuncionario.Create;
+begin
+  inherited;
+end;
+
+destructor TFuncionario.Destroy;
+begin
+  if Assigned(FDependnetes) then
+    FDependnetes.DisposeOf;
+  inherited;
+end;
+
+procedure TFuncionario.SetDependnetes(const Value: TObjectList<TDependente>);
+begin
+  if not Assigned(Value) then
+    FDependnetes := TObjectList<TDependente>.Create;
+  FDependnetes := Value;
+end;
+
+initialization
+  RegisterClass(TFuncionario);
+
+end.

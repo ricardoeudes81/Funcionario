@@ -1,0 +1,39 @@
+unit Utils.unUtils;
+
+interface
+
+uses
+  System.SysUtils;
+
+type
+
+  TTipoAcao = (taNavegar, taInserir, taEditar, taConsultar);
+
+
+  TUtils = class
+  public
+    class function TransformaValorStringParaFloat(valor: string): Double;
+  end;
+
+
+const
+  FORMATO_VALOR: string = '###,###,###,###,###,##0.00';
+  VALOR_ZERO: string = '0,00';
+
+
+type
+  TTipoSimNao = (tpSim, tpNao);
+const
+  TSimNao: array[TTipoSimNao] of string = ('Sim', 'Não');
+
+
+implementation
+
+{ TUtils }
+
+class function TUtils.TransformaValorStringParaFloat(valor: string): Double;
+begin
+  Result := StrToFloatDef(StringReplace(valor, '.', '', [rfReplaceAll]), 0);
+end;
+
+end.

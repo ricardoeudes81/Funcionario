@@ -1,0 +1,59 @@
+unit unControllerFuncionario;
+
+interface
+
+uses
+  Funcionario, unDAOFuncionario;
+
+type
+
+  TControllerFuncionario = class
+  public
+    function Salvar(Entidade: TFuncionario): Integer;
+    function Remover(Entidade: TFuncionario): Boolean;
+    function ObterFuncionario(Id: Integer): TFuncionario;
+  end;
+
+implementation
+
+{ TControllerFuncionario }
+
+function TControllerFuncionario.ObterFuncionario(Id: Integer): TFuncionario;
+begin
+
+  //objFuncio
+end;
+
+function TControllerFuncionario.Remover(Entidade: TFuncionario): Boolean;
+var
+  lResultado: Boolean;
+begin
+  lResultado := False;
+  try
+    if not Assigned(Entidade) then
+      Exit;
+
+    TDAOFuncionario.Delete(Entidade);
+    lResultado := True;
+  finally
+    Result := lResultado;
+  end;
+end;
+
+function TControllerFuncionario.Salvar(Entidade: TFuncionario): Integer;
+var
+  nResultado: Integer;
+begin
+  nResultado := 0;
+  try
+    if Entidade.Id = 0 then
+      nResultado := TDAOFuncionario.Insert(Entidade)
+    else
+      nResultado := TDAOFuncionario.Update(Entidade);
+
+  finally
+    Result := nResultado;
+  end;
+end;
+
+end.

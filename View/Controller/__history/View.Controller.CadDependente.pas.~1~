@@ -1,0 +1,36 @@
+unit View.Controller.CadDependente;
+
+interface
+
+uses
+  unControllerDependente, Dependente;
+
+type
+
+  IControllerCadDependente = interface
+    function ExcluirCadastroDependente(ADependente: TDependente): IControllerCadDependente;
+  end;
+
+  TControllerCadDependente = class
+  public
+    function ExcluirCadastroDependente(ADependente: TDependente): IControllerCadDependente;
+    class function New: IControllerCadDependente;
+  end;
+
+implementation
+
+{ TControllerCadDependente }
+
+function TControllerCadDependente.ExcluirCadastroDependente(
+  ADependente: TDependente): IControllerCadDependente;
+begin
+  Result := Self;
+  TControllerDependente.New.Remover(ADependente);
+end;
+
+class function TControllerCadDependente.New: IControllerCadDependente;
+begin
+  Result := Self.Create;
+end;
+
+end.

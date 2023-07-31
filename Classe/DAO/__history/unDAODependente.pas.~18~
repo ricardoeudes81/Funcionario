@@ -1,0 +1,105 @@
+unit unDAODependente;
+
+interface
+
+uses
+  unConection, Dependente, Funcionario, FireDAC.Stan.Param, System.SysUtils, DB,
+  System.Generics.Collections, System.Classes,
+  SimpleInterface, SimpleDAO, SimpleQueryFiredac, SimpleUtil;
+
+type
+
+  IDAODependente = interface
+  ['{49E603F4-0D99-4DCE-9F1F-D547E5FAEFB5}']
+    procedure Insert(objDependente: TDependente);
+    procedure Update(objDependente: TDependente);
+    procedure Delete(objDependente: TDependente);
+    function ObterListaDeDependentes(objFuncionario: TFuncionario): TObjectList<TDependente>;
+  end;
+
+  TDAODependente = class(TInterfacedPersistent, IDAODependente)
+  public
+    procedure Insert(objDependente: TDependente);
+    procedure Update(objDependente: TDependente);
+    procedure Delete(objDependente: TDependente);
+    function ObterListaDeDependentes(objFuncionario: TFuncionario): TObjectList<TDependente>;
+    class function New: IDAODependente;
+  end;
+
+implementation
+
+{ TDAODependente }
+
+class function TDAODependente.New: IDAODependente;
+begin
+  Result := Self.Create;
+end;
+
+procedure TDAODependente.Delete(objDependente: TDependente);
+var
+  Conn: iSimpleQuery;
+  DAOGenerico: iSimpleDAO<TDependente>;
+begin
+  if not Assigned(objDependente) then
+    Exit;
+
+  Conn := TSimpleQueryFiredac.New(TConexao.GetInstance);
+  DAOGenerico := TSimpleDAO<TDependente>.New(Conn);
+  DAOGenerico.Delete(objDependente);
+end;
+
+procedure TDAODependente.Insert(objDependente: TDependente);
+var
+  Conn: iSimpleQuery;
+  DAOGenerico: iSimpleDAO<TDependente>;
+begin
+  if not Assigned(objDependente) then
+    Exit;
+
+  var NextId := TConexao.GetNextId('DEPENDENTE', 'ID');
+  objDependente.Id := NextId;
+
+  Conn := TSimpleQueryFiredac.New(TConexao.GetInstance);
+  DAOGenerico := TSimpleDAO<TDependente>.New(Conn);
+  DAOGenerico.Insert(objDependente);
+end;
+
+function TDAODependente.ObterListaDeDependentes(
+  objFuncionario: TFuncionario): TObjectList<TDependente>;
+var
+  Conn: iSimpleQuery;
+  DAOGenerico: iSimpleDAO<TDependente>;
+begin
+  Result := TObjectList<TDependente>.Create;
+  if ((not Assigned(objFuncionario)) and (objFuncionario.Id = 0)) then
+    Exit;
+
+  var aDataSource := TDataSource.Create(nil);
+
+  Conn := TSimpleQueryFiredac.New(TConexao.GetInstance);
+  DAOGenerico := TSimpleDAO<TDependente>.New(Conn);
+  DAOGenerico.SQL
+      .Fields('*')
+      .Where('ID_FUNCIONARIO = ' + IntToStr(objFuncionario.Id))
+      .OrderBy('ID')
+      .&End
+    .Find
+    .DataSource(aDataSource);
+
+  TSimpleUtil.DataSetToObjectList<TDependente>(aDataSource.DataSet, Result);
+end;
+
+procedure TDAODependente.Update(objDependente: TDependente);
+var
+  Conn: iSimpleQuery;
+  DAOGenerico: iSimpleDAO<TDependente>;
+begin
+  if not Assigned(objDependente) then
+    Exit;
+
+  Conn := TSimpleQueryFiredac.New(TConexao.GetInstance);
+  DAOGenerico := TSimpleDAO<TDependente>.New(Conn);
+  DAOGenerico.Update(objDependente);
+end;
+
+end.

@@ -1,0 +1,30 @@
+unit unUtils;
+
+interface
+
+uses
+  System.SysUtils;
+
+type
+  TUtils = class
+  public
+    class function TransformaValorStringParaFloat(valor: string): Double;
+  end;
+
+
+type
+  TTipoSimNao = (tpSim, tpNao);
+const
+  TSimNao: array[TTipoSimNao] of string = ('Sim', 'Não');
+
+
+implementation
+
+{ TUtils }
+
+class function TUtils.TransformaValorStringParaFloat(valor: string): Double;
+begin
+  Result := StrToFloatDef(StringReplace(valor, '.', '', [rfReplaceAll]), 0);
+end;
+
+end.

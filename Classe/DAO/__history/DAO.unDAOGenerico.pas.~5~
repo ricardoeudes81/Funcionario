@@ -1,0 +1,149 @@
+unit DAO.unDAOGenerico;
+
+interface
+
+uses
+  Conexao.unConection, Entidade.Entidade, DB, DBClient, FireDAC.Stan.Param, System.Generics.Collections,
+  System.SysUtils, System.Classes, SimpleInterface, SimpleDAO, SimpleQueryFiredac, SimpleUtil,
+  FireDAC.Comp.Client, Utils.unUtils, System.Variants;
+
+type
+
+  IDAOGenerico<T: class> = interface
+  ['{7913DFD3-1474-4817-8CBD-E2D664A399E0}']
+    function Insert(AEntidade: T): Integer;
+    function Update(AEntidade: T): Integer;
+    procedure Delete(AEntidade: T);
+    function Load(Id: Integer): TDataSet;
+    function GetListEntity(): TObjectList<T>;
+    function ObterListaDaEntidade(Campo: string; Valor: Variant): TObjectList<T>;
+  end;
+
+  TDAOGenerico<T: class, constructor> = class(TInterfacedPersistent, IDAOGenerico<T>)
+  public
+    function Insert(AEntidade: T): Integer;
+    function Update(AEntidade: T): Integer;
+    procedure Delete(AEntidade: T);
+    function Load(Id: Integer): TDataSet;
+    function GetListEntity(): TObjectList<T>;
+    function ObterListaDaEntidade(Campo: string; Valor: Variant): TObjectList<T>;
+    class function New: IDAOGenerico<T>;
+  end;
+
+implementation
+
+{ TDAOGenerico<T> }
+
+procedure TDAOGenerico<T>.Delete(AEntidade: T);
+var
+  Conn: iSimpleQuery;
+  DAOGenerico: iSimpleDAO<T>;
+begin
+  if not Assigned(AEntidade) then
+    Exit;
+
+  Conn := TSimpleQueryFiredac.New(TConexao.GetInstance);
+  DAOGenerico := TSimpleDAO<T>.New(Conn);
+  DAOGenerico.Delete(AEntidade);
+end;
+
+function TDAOGenerico<T>.Insert(AEntidade: T): Integer;
+var
+  Conn: iSimpleQuery;
+  DAOGenerico: iSimpleDAO<T>;
+begin
+  Result := 0;
+  if not Assigned(AEntidade) then
+    Exit;
+
+  var NomeTabela := TUtils.GetTableName(TEntidade(AEntidade));
+
+  var NextId := TConexao.GetNextId(NomeTabela, 'ID');
+  TEntidade(AEntidade).Id := NextId;
+
+  Conn := TSimpleQueryFiredac.New(TConexao.GetInstance);
+  DAOGenerico := TSimpleDAO<T>.New(Conn);
+  DAOGenerico.Insert(AEntidade);
+  Result := TEntidade(AEntidade).Id;
+end;
+
+function TDAOGenerico<T>.Load(Id: Integer): TDataSet;
+var
+  Conn: iSimpleQuery;
+  DAOGenerico: iSimpleDAO<T>;
+begin
+  Result := nil;
+  if (Id = 0) then
+    Exit;
+
+  var dataSource := TDataSource.Create(nil);
+
+  Conn := TSimpleQueryFiredac.New(TConexao.GetInstance);
+  DAOGenerico := TSimpleDAO<T>.New(Conn);
+  DAOGenerico.SQL
+      .Fields('*')
+      .Where('ID = ' + IntToStr(Id))
+      .&End
+    .Find
+    .DataSource(dataSource);
+
+  Result := TClientDataSet(dataSource.DataSet).GetClonedDataSet(True);
+end;
+
+class function TDAOGenerico<T>.New: IDAOGenerico<T>;
+begin
+  Result := Self.Create;
+end;
+
+function TDAOGenerico<T>.ObterListaDaEntidade(Campo: string;
+  Valor: Variant): TObjectList<T>;
+var
+  Conn: iSimpleQuery;
+  DAOGenerico: iSimpleDAO<T>;
+begin
+  Result := TObjectList<T>.Create;
+  if (Campo.IsEmpty) or (VarToStr(Valor).IsEmpty) then
+    Exit;
+
+  var aDataSource := TDataSource.Create(nil);
+
+  Conn := TSimpleQueryFiredac.New(TConexao.GetInstance);
+  DAOGenerico := TSimpleDAO<T>.New(Conn);
+  DAOGenerico.SQL
+      .Fields('*')
+      .Where(Campo + ' = ' + VarToStr(Valor))
+      .OrderBy('ID')
+      .&End
+    .Find
+    .DataSource(aDataSource);
+
+  TSimpleUtil.DataSetToObjectList<T>(aDataSource.DataSet, Result);
+end;
+
+function TDAOGenerico<T>.GetListEntity: TObjectList<T>;
+var
+  Conn: iSimpleQuery;
+  DAOGenerico: iSimpleDAO<T>;
+begin
+  Result := TObjectList<T>.Create;
+  Conn := TSimpleQueryFiredac.New(TConexao.GetInstance);
+  DAOGenerico := TSimpleDAO<T>.New(Conn);
+  DAOGenerico.Find(Result);
+end;
+
+function TDAOGenerico<T>.Update(AEntidade: T): Integer;
+var
+  Conn: iSimpleQuery;
+  DAOGenerico: iSimpleDAO<T>;
+begin
+  Result := 0;
+  if not Assigned(AEntidade) then
+    Exit;
+
+  Conn := TSimpleQueryFiredac.New(TConexao.GetInstance);
+  DAOGenerico := TSimpleDAO<T>.New(Conn);
+  DAOGenerico.Update(AEntidade);
+  Result := TEntidade(AEntidade).Id;
+end;
+
+end.

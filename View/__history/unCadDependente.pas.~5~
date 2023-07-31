@@ -1,0 +1,48 @@
+unit unCadDependente;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.Buttons;
+
+type
+  TfrmCadDependente = class(TForm)
+    txtFuncionario: TStaticText;
+    lblId: TLabel;
+    edtId: TEdit;
+    lblNome: TLabel;
+    edtNome: TEdit;
+    chkCalculaIR: TCheckBox;
+    chkCalculaINSS: TCheckBox;
+    pnlButton: TPanel;
+    btnCancelar: TBitBtn;
+    btnConfirmar: TBitBtn;
+    grbBotoes: TGroupBox;
+    pnlDados: TPanel;
+    procedure btnCancelarClick(Sender: TObject);
+    procedure btnConfirmarClick(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmCadDependente: TfrmCadDependente;
+
+implementation
+
+{$R *.dfm}
+
+procedure TfrmCadDependente.btnCancelarClick(Sender: TObject);
+begin
+  Close;
+end;
+
+procedure TfrmCadDependente.btnConfirmarClick(Sender: TObject);
+begin
+  //
+end;
+
+end.

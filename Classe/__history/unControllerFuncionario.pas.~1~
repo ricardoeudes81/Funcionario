@@ -1,0 +1,26 @@
+unit unControllerFuncionario;
+
+interface
+
+uses
+  Funcionario;
+
+type
+
+  TControllerFuncionario = class
+  private
+
+  public
+    function Salvar(Entidade: Funcionario): Boolean;
+  end;
+
+implementation
+
+{ TControllerFuncionario }
+
+function TControllerFuncionario.Salvar(Entidade: Funcionario): Boolean;
+begin
+  //Result :=
+end;
+
+end.

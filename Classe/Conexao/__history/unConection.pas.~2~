@@ -1,0 +1,40 @@
+unit unConection;
+
+interface
+
+uses
+  System.SysUtils, System.Win.Registry, Winapi.Windows, System.Classes,
+  FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf, FireDAC.Phys.Intf,
+  FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async, FireDAC.Phys,
+  FireDAC.VCLUI.Wait, FireDAC.Comp.Client, Data.DbxSqlite, FireDAC.Phys.SQLite,
+  FireDAC.Phys.SQLiteDef, FireDAC.Stan.ExprFuncs, FireDAC.Stan.Intf,
+  DB, Datasnap.DBClient, Datasnap.Provider, FireDAC.DApt, inifiles;
+
+type
+  TQuery = class(FDQuery)
+  end;
+
+  TConexao = class(FDConnection)
+  strict private
+
+  private
+    function GetDatabaseNameFromIni(): string;
+  end;
+
+implementation
+
+uses
+  Vcl.Forms;
+
+{ TConexao }
+
+function TConexao.GetDatabaseNameFromIni: string;
+begin
+  var appINI: TIniFile;
+  var Diretorio := IncludeTrailingPathDelimiter(ExtractFileDir(Application.ExeName));
+  appINI := TIniFile.Create(Diretorio + 'app.ini');
+  Result := appINI.ReadString('Conexao', 'Base');
+  appINI.Free;
+end;
+
+end.

@@ -1,0 +1,67 @@
+unit unCadDependente;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.Buttons, Dependente;
+
+type
+  TfrmCadDependente = class(TForm)
+    txtFuncionario: TStaticText;
+    lblId: TLabel;
+    edtId: TEdit;
+    lblNome: TLabel;
+    edtNome: TEdit;
+    chkCalculaIR: TCheckBox;
+    chkCalculaINSS: TCheckBox;
+    pnlButton: TPanel;
+    btnCancelar: TBitBtn;
+    btnConfirmar: TBitBtn;
+    grbBotoes: TGroupBox;
+    pnlDados: TPanel;
+    procedure btnCancelarClick(Sender: TObject);
+    procedure btnConfirmarClick(Sender: TObject);
+  private
+    FDependente: TDependente;
+    procedure ChecarCamposObrigatorios();
+    { Private declarations }
+  public
+    property Dependente: TDependente  read FDependente write FDependente;
+    { Public declarations }
+  end;
+
+var
+  frmCadDependente: TfrmCadDependente;
+
+implementation
+
+{$R *.dfm}
+
+procedure TfrmCadDependente.btnCancelarClick(Sender: TObject);
+begin
+  Close;
+end;
+
+procedure TfrmCadDependente.btnConfirmarClick(Sender: TObject);
+begin
+  ChecarCamposObrigatorios();
+  FDependente.Id :=  StrToIntDef(edtId.Text, 0);
+  FDependente.Nome := Trim(edtNome.Text);
+  FDependente.CalculaIR := chkCalculaIR.Checked;
+  FDependente.CalculaINSS := chkCalculaINSS.Checked;
+end;
+
+procedure TfrmCadDependente.ChecarCamposObrigatorios;
+begin
+  if (Trim(edtNome.Text) = EmptyStr) then
+  begin
+    ShowMessage('Campo "Nome" não preenchido.' + sLineBreak +
+      'Por favor, verifique.');
+    if edtNome.CanFocus then
+      edtNome.SetFocus;
+    Abort;
+  end;
+end;
+
+end.

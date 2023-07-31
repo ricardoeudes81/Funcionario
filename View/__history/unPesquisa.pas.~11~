@@ -1,0 +1,91 @@
+unit unPesquisa;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Data.DB, Vcl.StdCtrls,
+  Vcl.Buttons, Vcl.Grids, Vcl.DBGrids, Datasnap.DBClient, unControllerFuncionario;
+
+type
+  TfrmPesquisa = class(TForm)
+    pnlFiltro: TPanel;
+    pnlGrid: TPanel;
+    pnlBotoes: TPanel;
+    DBGrid1: TDBGrid;
+    grbBotoes: TGroupBox;
+    btnConfirmar: TBitBtn;
+    btnCanelar: TBitBtn;
+    lblFiltro: TLabel;
+    edtFiltro: TEdit;
+    cdsPesquisa: TClientDataSet;
+    dscPesquisa: TDataSource;
+    cdsPesquisaID: TIntegerField;
+    cdsPesquisaNOME: TStringField;
+    cdsPesquisaCPF: TStringField;
+    cdsPesquisaSALARIO: TFloatField;
+    procedure btnConfirmarClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure btnCanelarClick(Sender: TObject);
+  private
+    FIdPesquisado: Integer;
+    procedure BuscarListaDeEntidade();
+
+    { Private declarations }
+  public
+    property IdPesquisado: Integer read FIdPesquisado;
+
+    { Public declarations }
+  end;
+
+var
+  frmPesquisa: TfrmPesquisa;
+
+implementation
+
+{$R *.dfm}
+
+procedure TfrmPesquisa.btnCanelarClick(Sender: TObject);
+begin
+  Close;
+end;
+
+procedure TfrmPesquisa.btnConfirmarClick(Sender: TObject);
+begin
+  if cdsPesquisa.IsEmpty then
+    Exit;
+  FIdPesquisado := cdsPesquisa.FieldByName('ID').AsInteger;
+  Close;
+  ModalResult := mrOk;
+end;
+
+procedure TfrmPesquisa.BuscarListaDeEntidade;
+begin
+  var Controller := TControllerFuncionario.Create;
+  var Funcionarios := Controller.ObterListaFuncionarios();
+  try
+    cdsPesquisa.DisableControls;
+    for var Funcionario in Funcionarios do
+    begin
+      cdsPesquisa.Append;
+      cdsPesquisa.FieldByName('ID').AsInteger := Funcionario.Id;
+      cdsPesquisa.FieldByName('NOME').AsString := Funcionario.Nome;
+      cdsPesquisa.FieldByName('CPF').AsString := Funcionario.CPF;
+      cdsPesquisa.FieldByName('SALARIO').AsFloat := Funcionario.Salario;
+      cdsPesquisa.Post;
+    end;
+  finally
+    while cdsPesquisa.ControlsDisabled do
+      cdsPesquisa.EnableControls;
+    Funcionarios.DisposeOf;
+    Controller.DisposeOf;
+  end;
+end;
+
+procedure TfrmPesquisa.FormCreate(Sender: TObject);
+begin
+  cdsPesquisa.CreateDataSet;
+  BuscarListaDeEntidade();
+end;
+
+end.

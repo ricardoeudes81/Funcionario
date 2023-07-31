@@ -1,0 +1,133 @@
+unit unConection;
+
+interface
+
+uses
+  System.SysUtils, System.Win.Registry, Winapi.Windows, System.Classes,
+  FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf, FireDAC.Phys.Intf,
+  FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async, FireDAC.Phys,
+  FireDAC.VCLUI.Wait, FireDAC.Comp.Client, Data.DbxSqlite, FireDAC.Phys.SQLite,
+  FireDAC.Phys.SQLiteDef, FireDAC.Stan.ExprFuncs, FireDAC.Stan.Intf,
+  DB, Datasnap.DBClient, Datasnap.Provider, FireDAC.DApt, inifiles;
+
+type
+  TQuery = class(TFDQuery);
+
+  TConexao = class(TFDConnection)
+  strict private
+    DriverLink: TFDPhysSQLiteDriverLink;
+    Transaction: TFDTransaction;
+    class var FInstance: TConexao;
+    procedure GetConexao();
+  private
+    function GetDatabaseNameFromIni(): string;
+  public
+    constructor Create(AOwner: TComponent); override;
+    class function GetInstance: TConexao;
+    class function GetQuery: TQuery;
+    class function GetNextId(TableName, CampoId: String): Integer;
+    procedure FecharConexao();
+  end;
+
+implementation
+
+uses
+  Vcl.Forms;
+
+{ TConexao }
+
+constructor TConexao.Create(AOwner: TComponent);
+begin
+  inherited;
+
+end;
+
+procedure TConexao.FecharConexao;
+begin
+  FInstance.Close;
+end;
+
+procedure TConexao.GetConexao;
+
+  procedure CriarTransaction();
+  begin
+    Transaction := TFDTransaction.Create(nil);
+    Transaction.Connection := FInstance;
+  end;
+
+begin
+  var NomeArquivoBase := GetDatabaseNameFromIni();
+  DriverLink := TFDPhysSQLiteDriverLink.Create(nil);
+  CriarTransaction();
+  FInstance.Params.Values['DriverID'] := 'SQLite';
+  FInstance.UpdateOptions.LockWait := False;
+
+  FInstance.Params.Values['Database'] := NomeArquivoBase;
+
+  (FInstance.Params as TFDPhysSQLiteConnectionDefParams).StringFormat := TFDSQLiteStringFormat.sfANSI;
+
+  FInstance.Params.Values['SharedCache'] := 'False';
+  FInstance.Params.Values['Synchronous'] := 'Normal';
+  FInstance.Params.Values['LockingMode'] := 'Normal';
+
+  FInstance.TxOptions.AutoCommit := True;
+  FInstance.TxOptions.AutoStart := True;
+  FInstance.TxOptions.EnableNested := False;
+  FInstance.TxOptions.AutoStop := False;
+  FInstance.TxOptions.ReadOnly := False;
+  FInstance.TxOptions.Isolation := xiReadCommitted;
+  FInstance.TxOptions.StopOptions := [xoIfAutoStarted, xoIfCmdsInactive];
+
+  FInstance.Connected := True;
+
+end;
+
+function TConexao.GetDatabaseNameFromIni: string;
+begin
+  var appINI: TIniFile;
+  var Diretorio := IncludeTrailingPathDelimiter(ExtractFileDir(Application.ExeName));
+  appINI := TIniFile.Create(Diretorio + 'app.ini');
+  Result := appINI.ReadString('Conexao', 'Base', EmptyStr);
+  appINI.Free;
+end;
+
+class function TConexao.GetInstance: TConexao;
+begin
+  if not Assigned(Self.FInstance) then
+  begin
+    FInstance := TConexao(Inherited NewInstance);
+    FInstance.Create(nil);
+    with FInstance.FormatOptions do
+    begin
+      OwnMapRules := True;
+      with MapRules.Add do
+      begin
+        SourceDataType := dtMemo;
+        TargetDataType := dtAnsiString;
+      end;
+    end;
+    FInstance.GetConexao;
+  end;
+  if not Self.FInstance.InTransaction then
+    Self.FInstance.StartTransaction;
+
+  Result := Self.FInstance;
+end;
+
+class function TConexao.GetNextId(TableName, CampoId: String): Integer;
+begin
+  var Query: TFDQuery;
+  Query := GetQuery;
+  Query.Open('SELECT IfNull(MAX('+ CampoId + '), 0) + 1 AS MAX FROM ' + TableName);
+  Result := Query.FieldByName('MAX').AsInteger;
+end;
+
+class function TConexao.GetQuery: TQuery;
+begin
+  var Query: TFDQuery;
+  Query := TFDQuery.Create(nil);
+  Query.Connection := GetInstance;
+  Result := TQuery(Query);
+end;
+
+end.

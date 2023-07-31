@@ -1,0 +1,49 @@
+unit View.Controller.CadFuncionario;
+
+interface
+
+uses
+  System.Generics.Collections, System.Classes, unControllerFuncionario,
+  unControllerDependente, Dependente;
+
+type
+
+  IControllerCadFuncionario = interface
+  ['{391B80CD-D5C4-4537-BD09-F9198C40DBEA}']
+    function ExcluirCadastroFuncionario(AIdFuncionario: Integer): IControllerCadFuncionario;
+    function ExcluirCadastroDependentes(ALista: TObjectList<TDependente>): IControllerCadFuncionario;
+  end;
+
+  TControllerCadFuncionario = class(TInterfacedPersistent, IControllerCadFuncionario)
+  public
+    function ExcluirCadastroFuncionario(AIdFuncionario: Integer): IControllerCadFuncionario;
+    function ExcluirCadastroDependentes(ALista: TObjectList<TDependente>): IControllerCadFuncionario;
+    class function New: IControllerCadFuncionario;
+  end;
+
+implementation
+
+{ TControllerCadFuncionario }
+
+function TControllerCadFuncionario.ExcluirCadastroDependentes(
+  ALista: TObjectList<TDependente>): IControllerCadFuncionario;
+begin
+  Result := Self;
+  TControllerDependente.New.Remover(ALista);
+end;
+
+function TControllerCadFuncionario.ExcluirCadastroFuncionario(
+  AIdFuncionario: Integer): IControllerCadFuncionario;
+begin
+  Result := Self;
+  var ControllerFunc := TControllerFuncionario.New;
+  var objFuncionario := ControllerFunc.ObterFuncionario(AIdFuncionario);
+  ControllerFunc.Remover(objFuncionario);
+end;
+
+class function TControllerCadFuncionario.New: IControllerCadFuncionario;
+begin
+  Result := Self.Create;
+end;
+
+end.

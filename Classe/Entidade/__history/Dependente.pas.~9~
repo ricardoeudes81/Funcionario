@@ -1,0 +1,33 @@
+unit Dependente;
+
+interface
+
+uses
+  SimpleAttributes;
+
+type
+
+  [Tabela('DEPENDENTE')]
+  TDependente = class
+  private
+    FId: Integer;
+    FIdFuncionario: Integer;
+    FNome: string;
+    FCalculaIR: Boolean;
+    FCalculaINSS: Boolean;
+  public
+    [Campo('ID'), PK]
+    property Id: Integer read FId write FId;
+    [Campo('ID_FUNCIONARIO')]
+    property IdFuncionario: Integer read FIdFuncionario write FIdFuncionario;
+    [Campo('NOME')]
+    property Nome: string read FNome write FNome;
+    [Campo('CALCULAIR')]
+    property CalculaIR: Boolean read FCalculaIR write FCalculaIR;
+    [Campo('CALCULAINSS')]
+    property CalculaINSS: Boolean read FCalculaINSS write FCalculaINSS;
+  end;
+
+implementation
+
+end.

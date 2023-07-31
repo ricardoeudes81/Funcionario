@@ -1,0 +1,145 @@
+unit unDAOFuncionario;
+
+interface
+
+uses
+  unConection, Funcionario, DB, FireDAC.Stan.Param, System.Generics.Collections,
+  System.Classes, SimpleInterface, SimpleDAO, SimpleQueryFiredac;
+
+type
+
+  IDAOFuncionario = interface
+  ['{6C99FAD4-1FF1-4A3E-B804-AB69F5692ADD}']
+    function Insert(objFuncionario: TFuncionario): Integer;
+    function Update(objFuncionario: TFuncionario): Integer;
+    procedure Delete(objFuncionario: TFuncionario);
+    function Load(Id: Integer): TDataSet;
+    function ObterListaFuncionarios(): TObjectList<TFuncionario>;
+  end;
+
+  TDAOFuncionario = class(TInterfacedPersistent, IDAOFuncionario)
+  public
+    function Insert(objFuncionario: TFuncionario): Integer;
+    function Update(objFuncionario: TFuncionario): Integer;
+    procedure Delete(objFuncionario: TFuncionario);
+    function Load(Id: Integer): TDataSet;
+    function ObterListaFuncionarios(): TObjectList<TFuncionario>;
+    class function New: IDAOFuncionario;
+  end;
+
+implementation
+
+{ TDAOFuncionario }
+
+procedure TDAOFuncionario.Delete(objFuncionario: TFuncionario);
+var
+  Conn: iSimpleQuery;
+  DAOGenerico: iSimpleDAO<TFuncionario>;
+begin
+  if not Assigned(objFuncionario) then
+    Exit;
+
+  Conn := TSimpleQueryFiredac.New(TConexao.GetInstance);
+  DAOGenerico := TSimpleDAO<TFuncionario>.New(Conn);
+  DAOGenerico.Delete(objFuncionario);
+end;
+
+function TDAOFuncionario.Insert(objFuncionario: TFuncionario): Integer;
+var
+  Conn: iSimpleQuery;
+  DAOGenerico: iSimpleDAO<TFuncionario>;
+begin
+  Result := 0;
+  if not Assigned(objFuncionario) then
+    Exit;
+
+  var NextId := TConexao.GetNextId('FUNCIONARIO', 'ID');
+  objFuncionario.Id := NextId;
+
+  Conn := TSimpleQueryFiredac.New(TConexao.GetInstance);
+  DAOGenerico := TSimpleDAO<TFuncionario>.New(Conn);
+  DAOGenerico.Insert(objFuncionario);
+  Result := objFuncionario.Id;
+end;
+
+function TDAOFuncionario.Load(Id: Integer): TDataSet;
+const
+  SQL_SELECT: string = (
+    'SELECT * FROM FUNCIONARIO WHERE ID = :ID'
+  );
+begin
+  Result := nil;
+  if (Id = 0) then
+    Exit;
+
+  var Query := TConexao.GetQuery;
+  try
+    try
+      Query.SQL.Text := SQL_SELECT;
+      Query.Close;
+      Query.ParamByName('ID').AsInteger := Id;
+      Query.Open;
+    except
+      TConexao.GetInstance.RollbackRetaining;
+    end;
+  finally
+    Result := Query;
+  end;
+end;
+
+class function TDAOFuncionario.New: IDAOFuncionario;
+begin
+  Result := Self.Create;
+end;
+
+function TDAOFuncionario.ObterListaFuncionarios: TObjectList<TFuncionario>;
+const
+  SQL_SELECT: string = (
+    'SELECT * FROM FUNCIONARIO ORDER BY ID'
+  );
+begin
+  Result := TObjectList<TFuncionario>.Create;
+  Result.Clear;
+
+  var Query := TConexao.GetQuery;
+  try
+    try
+      Query.SQL.Text := SQL_SELECT;
+      Query.Close;
+      Query.Open;
+      Query.First;
+      while not Query.Eof do
+      begin
+        var Funcionario := TFuncionario.Create;
+        Funcionario.Id := Query.FieldByName('ID').AsInteger;
+        Funcionario.Nome := Query.FieldByName('NOME').AsString;
+        Funcionario.CPF := Query.FieldByName('CPF').AsString;
+        Funcionario.Salario := Query.FieldByName('SALARIO').AsFloat;
+
+        Result.Add(Funcionario);
+        Query.Next;
+      end;
+    except
+      TConexao.GetInstance.RollbackRetaining;
+    end;
+  finally
+    Query.DisposeOf;
+  end;
+end;
+
+function TDAOFuncionario.Update(objFuncionario: TFuncionario): Integer;
+var
+  Conn: iSimpleQuery;
+  DAOGenerico: iSimpleDAO<TFuncionario>;
+begin
+  Result := 0;
+  if not Assigned(objFuncionario) then
+    Exit;
+
+  Conn := TSimpleQueryFiredac.New(TConexao.GetInstance);
+  DAOGenerico := TSimpleDAO<TFuncionario>.New(Conn);
+  DAOGenerico.Update(objFuncionario);
+  Result := objFuncionario.Id;
+end;
+
+end.

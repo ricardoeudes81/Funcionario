@@ -1,0 +1,11 @@
+{
+	"name": "Funcionario",
+	"description": "",
+	"version": "1.0.0",
+	"homepage": "",
+	"mainsrc": "./src",
+	"projects": [],
+	"dependencies": {
+		"github.com/academiadocodigo/simpleorm": "^2.02.10"
+	}
+}
