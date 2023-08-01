@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{27303CEE-1D2E-4C75-A7E1-B7A7C81D9A5C}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="CalculoFuncionario.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Test\CalculoFuncionarioTests.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="CalculoFuncionario">
+        <MSBuild Projects="CalculoFuncionario.dproj"/>
+    </Target>
+    <Target Name="CalculoFuncionario:Clean">
+        <MSBuild Projects="CalculoFuncionario.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="CalculoFuncionario:Make">
+        <MSBuild Projects="CalculoFuncionario.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="CalculoFuncionarioTests">
+        <MSBuild Projects="Test\CalculoFuncionarioTests.dproj"/>
+    </Target>
+    <Target Name="CalculoFuncionarioTests:Clean">
+        <MSBuild Projects="Test\CalculoFuncionarioTests.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="CalculoFuncionarioTests:Make">
+        <MSBuild Projects="Test\CalculoFuncionarioTests.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="CalculoFuncionario;CalculoFuncionarioTests"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="CalculoFuncionario:Clean;CalculoFuncionarioTests:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="CalculoFuncionario:Make;CalculoFuncionarioTests:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
