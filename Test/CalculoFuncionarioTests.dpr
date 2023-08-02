@@ -15,7 +15,9 @@ program CalculoFuncionarioTests;
 {$ENDIF}
 
 uses
-  DUnitTestRunner;
+  DUnitTestRunner,
+  TestCalculaImpostos in 'TestCalculaImpostos.pas',
+  CalculaImpostos.unCalculaImpostos in '..\CalculaImpostos\CalculaImpostos.unCalculaImpostos.pas';
 
 {$R *.RES}
 

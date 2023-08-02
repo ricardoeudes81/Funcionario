@@ -15,16 +15,6 @@ uses
   TestFramework, CalculaImpostos.unCalculaImpostos;
 
 type
-  // Test methods for class TCalculo
-
-  TestTCalculo = class(TTestCase)
-  strict private
-    FCalculo: TCalculo;
-  public
-    procedure SetUp; override;
-    procedure TearDown; override;
-  end;
-  // Test methods for class TImposto
 
   TestTImposto = class(TTestCase)
   strict private
@@ -59,17 +49,6 @@ type
   end;
 
 implementation
-
-procedure TestTCalculo.SetUp;
-begin
-  FCalculo := TCalculo.Create;
-end;
-
-procedure TestTCalculo.TearDown;
-begin
-  FCalculo.Free;
-  FCalculo := nil;
-end;
 
 procedure TestTImposto.SetUp;
 begin
@@ -142,7 +121,6 @@ end;
 
 initialization
   // Register any test cases with the test runner
-  RegisterTest(TestTCalculo.Suite);
   RegisterTest(TestTImposto.Suite);
   RegisterTest(TestTCalculoIR.Suite);
   RegisterTest(TestTCalculoINSS.Suite);
