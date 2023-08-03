@@ -9,6 +9,9 @@
         <Projects Include="Test\CalculoFuncionarioTests.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="TestX\CalculoFuncionarioTestsX.dproj">
+            <Dependencies/>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -35,14 +38,23 @@
     <Target Name="CalculoFuncionarioTests:Make">
         <MSBuild Projects="Test\CalculoFuncionarioTests.dproj" Targets="Make"/>
     </Target>
+    <Target Name="CalculoFuncionarioTestsX">
+        <MSBuild Projects="TestX\CalculoFuncionarioTestsX.dproj"/>
+    </Target>
+    <Target Name="CalculoFuncionarioTestsX:Clean">
+        <MSBuild Projects="TestX\CalculoFuncionarioTestsX.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="CalculoFuncionarioTestsX:Make">
+        <MSBuild Projects="TestX\CalculoFuncionarioTestsX.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="CalculoFuncionario;CalculoFuncionarioTests"/>
+        <CallTarget Targets="CalculoFuncionario;CalculoFuncionarioTests;CalculoFuncionarioTestsX"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="CalculoFuncionario:Clean;CalculoFuncionarioTests:Clean"/>
+        <CallTarget Targets="CalculoFuncionario:Clean;CalculoFuncionarioTests:Clean;CalculoFuncionarioTestsX:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="CalculoFuncionario:Make;CalculoFuncionarioTests:Make"/>
+        <CallTarget Targets="CalculoFuncionario:Make;CalculoFuncionarioTests:Make;CalculoFuncionarioTestsX:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>
